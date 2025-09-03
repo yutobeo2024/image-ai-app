@@ -29,35 +29,90 @@ const CropPanel: React.FC<CropPanelProps> = ({ onApplyCrop, onSetAspect, isLoadi
   ];
 
   return (
-    <div className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-4 flex flex-col items-center gap-4 animate-fade-in backdrop-blur-sm">
-      <h3 className="text-lg font-semibold text-gray-300">Cắt ảnh</h3>
-      <p className="text-sm text-gray-400 -mt-2">Nhấp và kéo trên ảnh để chọn vùng cắt.</p>
-      
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-400">Tỷ lệ khung hình:</span>
-        {aspects.map(({ name, value, displayName }) => (
-          <button
-            key={name}
-            onClick={() => handleAspectChange(name, value)}
-            disabled={isLoading}
-            className={`px-4 py-2 rounded-md text-base font-semibold transition-all duration-200 active:scale-95 disabled:opacity-50 ${
-              activeAspect === name 
-              ? 'bg-gradient-to-br from-teal-600 to-teal-500 text-white shadow-md shadow-teal-500/20' 
-              : 'bg-white/10 hover:bg-white/20 text-gray-200'
-            }`}
-          >
-            {displayName}
-          </button>
-        ))}
-      </div>
+    <div className="flex flex-col h-full">
+      <div className="flex flex-col gap-4 p-4">
+        <h2 className="text-xl font-bold text-gray-200">Cắt ảnh</h2>
+        
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              className={`p-3 rounded-lg border flex flex-col items-center justify-center gap-2 transition-all ${
+                aspectRatio === 'free'
+                  ? 'bg-blue-900/50 border-blue-500'
+                  : 'bg-blue-950/30 border-blue-800/50 hover:border-blue-700'
+              }`}
+              onClick={() => setAspectRatio('free')}
+            >
+              <div className="w-12 h-12 rounded-md overflow-hidden bg-blue-900 flex items-center justify-center">
+                <CropIcon className="w-6 h-6 text-cyan-400" />
+              </div>
+              <span className="text-sm text-gray-300">Tự do</span>
+            </button>
+            
+            <button
+              className={`p-3 rounded-lg border flex flex-col items-center justify-center gap-2 transition-all ${
+                aspectRatio === '1:1'
+                  ? 'bg-blue-900/50 border-blue-500'
+                  : 'bg-blue-950/30 border-blue-800/50 hover:border-blue-700'
+              }`}
+              onClick={() => setAspectRatio('1:1')}
+            >
+              <div className="w-12 h-12 rounded-md overflow-hidden bg-blue-900 flex items-center justify-center">
+                <SquareIcon className="w-6 h-6 text-cyan-400" />
+              </div>
+              <span className="text-sm text-gray-300">Vuông (1:1)</span>
+            </button>
+            
+            <button
+              className={`p-3 rounded-lg border flex flex-col items-center justify-center gap-2 transition-all ${
+                aspectRatio === '4:3'
+                  ? 'bg-blue-900/50 border-blue-500'
+                  : 'bg-blue-950/30 border-blue-800/50 hover:border-blue-700'
+              }`}
+              onClick={() => setAspectRatio('4:3')}
+            >
+              <div className="w-12 h-12 rounded-md overflow-hidden bg-blue-900 flex items-center justify-center">
+                <RectangleHorizontalIcon className="w-6 h-6 text-cyan-400" />
+              </div>
+              <span className="text-sm text-gray-300">4:3</span>
+            </button>
+            
+            <button
+              className={`p-3 rounded-lg border flex flex-col items-center justify-center gap-2 transition-all ${
+                aspectRatio === '16:9'
+                  ? 'bg-blue-900/50 border-blue-500'
+                  : 'bg-blue-950/30 border-blue-800/50 hover:border-blue-700'
+              }`}
+              onClick={() => setAspectRatio('16:9')}
+            >
+              <div className="w-12 h-12 rounded-md overflow-hidden bg-blue-900 flex items-center justify-center">
+                <RectangleWideIcon className="w-6 h-6 text-cyan-400" />
+              </div>
+              <span className="text-sm text-gray-300">16:9</span>
+            </button>
+          </div>
+        </div>
 
-      <button
-        onClick={onApplyCrop}
-        disabled={isLoading || !isCropping}
-        className="w-full max-w-xs mt-2 bg-gradient-to-br from-green-600 to-green-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 ease-in-out shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/40 hover:-translate-y-px active:scale-95 active:shadow-inner text-base disabled:from-green-800 disabled:to-green-700 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
-      >
-        Áp dụng Cắt
-      </button>
+        <div className="mt-4">
+          <button
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+            onClick={handleApplyCrop}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Spinner className="w-5 h-5" />
+                Đang áp dụng...
+              </>
+            ) : (
+              <>
+                <CheckIcon className="w-5 h-5" />
+                Áp dụng cắt ảnh
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

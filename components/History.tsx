@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../services/authContext';
 import Spinner from './Spinner';
-
-interface EditHistory {
-  id: string;
-  timestamp: number;
-  prompt: string;
-  imageUrl: string;
-}
+import { getEditHistory, EditHistory } from '../services/historyService';
 
 const History: React.FC = () => {
   const [history, setHistory] = useState<EditHistory[]>([]);
@@ -16,31 +10,22 @@ const History: React.FC = () => {
   const { isAuthenticated } = useContext(AuthContext);
 
   useEffect(() => {
-    const fetchHistory = async () => {
+    const loadHistory = () => {
       if (!isAuthenticated) return;
       
       try {
         setLoading(true);
-        const response = await fetch('/api/history', {
-          headers: {
-            'Authorization': 'Bearer admin_token'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Không thể tải lịch sử chỉnh sửa');
-        }
-
-        const data = await response.json();
+        // Sử dụng localStorage thay vì API
+        const data = getEditHistory();
         setHistory(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi');
+        setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi đọc lịch sử');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHistory();
+    loadHistory();
   }, [isAuthenticated]);
 
   const formatDate = (timestamp: number) => {
@@ -64,30 +49,47 @@ const History: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Lịch sử chỉnh sửa ảnh</h1>
-      
-      {history.length === 0 ? (
-        <p className="text-gray-500">Chưa có lịch sử chỉnh sửa nào.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {history.map((item) => (
-            <div key={item.id} className="border rounded-lg overflow-hidden shadow-md">
-              <div className="relative h-48">
-                <img 
-                  src={item.imageUrl} 
-                  alt={`Ảnh chỉnh sửa ${item.id}`} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <p className="text-sm text-gray-500 mb-2">{formatDate(item.timestamp)}</p>
-                <p className="font-medium">Prompt: {item.prompt}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="flex flex-col h-full">
+      <div className="flex flex-col gap-4 p-4">
+        <h2 className="text-xl font-bold text-gray-200">Lịch sử chỉnh sửa</h2>
+        
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Spinner className="w-8 h-8 text-blue-500" />
+          </div>
+        ) : history.length === 0 ? (
+          <div className="text-center py-8 text-gray-400">
+            <HistoryIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p>Chưa có lịch sử chỉnh sửa</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 overflow-y-auto">
+            {history.map((item, index) => (
+              <button
+                key={index}
+                className="bg-blue-900/30 border border-blue-800/50 rounded-lg p-2 hover:border-blue-700 transition-colors"
+                onClick={() => onSelectHistoryItem(item)}
+              >
+                <div className="aspect-square w-full overflow-hidden rounded-md mb-2">
+                  <img
+                    src={item.imageUrl}
+                    alt={`Chỉnh sửa #${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-medium text-gray-300 truncate">
+                    {item.operation}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {new Date(item.timestamp).toLocaleString()}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

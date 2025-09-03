@@ -40,42 +40,55 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilter, isLoading }) =
   };
 
   return (
-    <div className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-4 flex flex-col gap-4 animate-fade-in backdrop-blur-sm">
-      <h3 className="text-lg font-semibold text-center text-gray-300">Áp dụng Bộ lọc</h3>
-      
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {presets.map(preset => (
-          <button
-            key={preset.name}
-            onClick={() => handlePresetClick(preset.prompt)}
-            disabled={isLoading}
-            className={`w-full text-center bg-white/10 border border-transparent text-gray-200 font-semibold py-3 px-4 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/20 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed ${selectedPresetPrompt === preset.prompt ? 'ring-2 ring-offset-2 ring-offset-gray-800 ring-teal-500' : ''}`}
-          >
-            {preset.name}
-          </button>
-        ))}
-      </div>
-
-      <input
-        type="text"
-        value={customPrompt}
-        onChange={handleCustomChange}
-        placeholder="Hoặc mô tả một bộ lọc tùy chỉnh (ví dụ: 'phong cách synthwave thập niên 80')"
-        className="flex-grow bg-gray-800 border border-gray-600 text-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-teal-500 focus:outline-none transition w-full disabled:cursor-not-allowed disabled:opacity-60 text-base"
-        disabled={isLoading}
-      />
-      
-      {activePrompt && (
-        <div className="animate-fade-in flex flex-col gap-4 pt-2">
-          <button
-            onClick={handleApply}
-            className="w-full bg-gradient-to-br from-teal-600 to-teal-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 ease-in-out shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/40 hover:-translate-y-px active:scale-95 active:shadow-inner text-base disabled:from-teal-800 disabled:to-teal-700 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
-            disabled={isLoading || !activePrompt.trim()}
-          >
-            Áp dụng Bộ lọc
-          </button>
+    <div className="flex flex-col h-full">
+      <div className="flex flex-col gap-4 p-4">
+        <h2 className="text-xl font-bold text-gray-200">Bộ lọc</h2>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {presets.map(preset => (
+            <button
+              key={preset.name}
+              className={`p-3 rounded-lg border flex flex-col items-center justify-center gap-2 transition-all ${
+                selectedPresetPrompt === preset.prompt
+                  ? 'bg-blue-900/50 border-blue-500'
+                  : 'bg-blue-950/30 border-blue-800/50 hover:border-blue-700'
+              }`}
+              onClick={() => handlePresetClick(preset.prompt)}
+              disabled={isLoading}
+            >
+              <div className="w-12 h-12 rounded-md overflow-hidden bg-blue-900 flex items-center justify-center">
+                <span className="text-cyan-400">{preset.name.charAt(0)}</span>
+              </div>
+              <span className="text-sm text-gray-300">{preset.name}</span>
+            </button>
+          ))}
         </div>
-      )}
+
+        <input
+          type="text"
+          value={customPrompt}
+          onChange={handleCustomChange}
+          placeholder="Hoặc mô tả một bộ lọc tùy chỉnh (ví dụ: 'phong cách synthwave thập niên 80')"
+          className="flex-grow bg-gray-800 border border-gray-600 text-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-blue-500 focus:outline-none transition w-full disabled:cursor-not-allowed disabled:opacity-60 text-base"
+          disabled={isLoading}
+        />
+        
+        {activePrompt && (
+          <div className="mt-4">
+            <button
+              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+              onClick={handleApply}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>Đang áp dụng...</>
+              ) : (
+                <>Áp dụng bộ lọc</>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

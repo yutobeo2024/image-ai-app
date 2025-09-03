@@ -10,6 +10,7 @@ import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
 import { generateEditedImage, generateFilteredImage, generateAdjustedImage } from './services/geminiService';
 import Header from './components/Header';
 import Spinner from './components/Spinner';
+import './components/Spinner.css';
 import FilterPanel from './components/FilterPanel';
 import AdjustmentPanel from './components/AdjustmentPanel';
 import CropPanel from './components/CropPanel';
@@ -19,6 +20,7 @@ import Login from './components/Login';
 import History from './components/History';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthProvider from './services/authContext';
+import { saveEditHistory } from './services/historyService';
 
 // Helper to convert a data URL string to a File object
 const dataURLtoFile = (dataurl: string, filename: string): File => {
@@ -139,6 +141,16 @@ const EditorApp: React.FC = () => {
         const editedImageUrl = await generateEditedImage(currentImage, prompt, editHotspot);
         const newImageFile = dataURLtoFile(editedImageUrl, `edited-${Date.now()}.png`);
         addImageToHistory(newImageFile);
+        
+        // Lưu lịch sử chỉnh sửa vào localStorage
+        saveEditHistory({
+          id: Date.now().toString(),
+          timestamp: new Date().toISOString(),
+          operation: 'edit',
+          description: prompt,
+          imageUrl: editedImageUrl
+        });
+        
         setEditHotspot(null);
         setDisplayHotspot(null);
     } catch (err) {
@@ -163,6 +175,15 @@ const EditorApp: React.FC = () => {
         const filteredImageUrl = await generateFilteredImage(currentImage, filterPrompt);
         const newImageFile = dataURLtoFile(filteredImageUrl, `filtered-${Date.now()}.png`);
         addImageToHistory(newImageFile);
+        
+        // Lưu lịch sử chỉnh sửa vào localStorage
+        saveEditHistory({
+          id: Date.now().toString(),
+          timestamp: new Date().toISOString(),
+          operation: 'filter',
+          description: filterPrompt,
+          imageUrl: filteredImageUrl
+        });
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Đã xảy ra lỗi không xác định.';
         setError(`Không thể áp dụng bộ lọc. ${errorMessage}`);
@@ -185,6 +206,15 @@ const EditorApp: React.FC = () => {
         const adjustedImageUrl = await generateAdjustedImage(currentImage, adjustmentPrompt);
         const newImageFile = dataURLtoFile(adjustedImageUrl, `adjusted-${Date.now()}.png`);
         addImageToHistory(newImageFile);
+        
+        // Lưu lịch sử chỉnh sửa vào localStorage
+        saveEditHistory({
+          id: Date.now().toString(),
+          timestamp: new Date().toISOString(),
+          operation: 'adjustment',
+          description: adjustmentPrompt,
+          imageUrl: adjustedImageUrl
+        });
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Đã xảy ra lỗi không xác định.';
         setError(`Không thể áp dụng tùy chỉnh. ${errorMessage}`);
@@ -235,6 +265,15 @@ const EditorApp: React.FC = () => {
     const croppedImageUrl = canvas.toDataURL('image/png');
     const newImageFile = dataURLtoFile(croppedImageUrl, `cropped-${Date.now()}.png`);
     addImageToHistory(newImageFile);
+    
+    // Lưu lịch sử chỉnh sửa vào localStorage
+    saveEditHistory({
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString(),
+      operation: 'crop',
+      description: 'Cắt ảnh',
+      imageUrl: croppedImageUrl
+    });
 
   }, [completedCrop, addImageToHistory]);
 
@@ -398,14 +437,14 @@ const EditorApp: React.FC = () => {
             )}
         </div>
         
-        <div className="w-full bg-gray-800/80 border border-gray-700/80 rounded-lg p-2 flex items-center justify-center gap-2 backdrop-blur-sm">
+        <div className="w-full bg-blue-900/40 border border-blue-700/80 rounded-lg p-2 flex items-center justify-center gap-2 backdrop-blur-sm">
             {(['retouch', 'crop', 'adjust', 'filters'] as Tab[]).map(tab => (
                  <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`w-full capitalize font-semibold py-3 px-5 rounded-md transition-all duration-200 text-base ${
                         activeTab === tab 
-                        ? 'bg-gradient-to-br from-teal-500 to-cyan-400 text-white shadow-lg shadow-cyan-500/40' 
+                        ? 'bg-gradient-to-br from-blue-500 to-cyan-400 text-white shadow-lg shadow-cyan-500/40' 
                         : 'text-gray-300 hover:text-white hover:bg-white/10'
                     }`}
                 >
