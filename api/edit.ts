@@ -43,9 +43,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(500).json({ error: 'Biến môi trường GEMINI_API_KEY hoặc API_KEYS chưa được đặt.' });
         }
 
-        // Sử dụng API key trực tiếp, không cần tách chuỗi
-        // Khởi tạo GoogleGenAI với cấu hình đơn giản nhất
-        const ai = new GoogleGenAI(apiKey);
+        // Khởi tạo GoogleGenAI với API key
+        const ai = new GoogleGenAI({ apiKey });
 
         const imagePart = { inlineData: { data: image, mimeType } };
         

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../services/authContext';
 import Spinner from './Spinner';
 import { getEditHistory, EditHistory } from '../services/historyService';
+import { ClockIcon as HistoryIcon } from './icons';
 
 const History: React.FC = () => {
   const [history, setHistory] = useState<EditHistory[]>([]);
@@ -30,6 +31,12 @@ const History: React.FC = () => {
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString('vi-VN');
+  };
+
+  const onSelectHistoryItem = (item: EditHistory) => {
+    // Xử lý khi người dùng chọn một mục lịch sử
+    console.log('Đã chọn mục lịch sử:', item);
+    // Có thể thêm logic để hiển thị ảnh đã chọn
   };
 
   if (loading) {
@@ -79,7 +86,7 @@ const History: React.FC = () => {
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-medium text-gray-300 truncate">
-                    {item.operation}
+                    {item.prompt}
                   </p>
                   <p className="text-xs text-gray-400">
                     {new Date(item.timestamp).toLocaleString()}
